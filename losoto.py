@@ -27,10 +27,17 @@ def my_close_open_files(verbose):
     are_open_files = len(open_files) > 0
     if verbose and are_open_files:
         print >> sys.stderr, "Closing remaining open files:",
-    for fileh in list(open_files.handlers):
-        if verbose:
-            print >> sys.stderr, "%s..." % (fileh.filename,),
-        fileh.close()
+    # Compatibility fix
+    if tables.__version__>='3.1.0':
+        for fileh in list(open_files.handlers):
+            if verbose:
+                print >> sys.stderr, "%s..." % (fileh.filename,),
+            fileh.close()
+    else:
+        for fileh in open_files.keys():
+            if verbose:
+                print >> sys.stderr, "%s..." % (open_files[fileh].filename,),
+            open_files[fileh].close()
         if verbose:
             print >> sys.stderr, "done",
     if verbose and are_open_files:
@@ -92,9 +99,9 @@ if __name__=='__main__':
     operations = { "RESET": operations.reset,
                    "EXAMPLE": operations.example,
     #               "CLOCKTEC": operations.clocktec,
-                   "FLAG": operations.flag,
-    #                "TECFIT": operations.tecfit,
-#                   "TECSCREEN": operations.tecscreen,
+    #               "FLAG": operations.flag,
+                   "TECFIT": operations.tecfit,
+                   "TECSCREEN": operations.tecscreen,
                    "SMOOTH": operations.smooth,
                    "INTERP": operations.interp,
                    "PLOT": operations.plot,

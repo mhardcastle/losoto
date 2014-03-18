@@ -33,7 +33,7 @@ def run( step, parset, H ):
         sf = solFetcher(soltab)
         sw = solWriter(soltab)
 
-        logging.info("Smoothing soltab: "+soltab.name)
+        logging.info("Flagging soltab: "+soltab._v_name)
 
         sf.setSelection(ant=ants, pol=pols, dir=dirs)
 
@@ -47,8 +47,8 @@ def run( step, parset, H ):
             return 1
 
         for i, axis in enumerate(axesToMed[:]):
-            if axis not in sf.getAxes():
-                del axesToSmooth[i]
+            if axis not in sf.getAxesNames():
+                del axesToMed[i]
                 logging.warning('Axis \"'+axis+'\" not found. Ignoring.')
 
         for vals, coord in sf.getValuesIter(returnAxes=axesToMed):
@@ -58,9 +58,11 @@ def run( step, parset, H ):
             valmedian = np.median(vals)
             clipvalue = valmedian * clipLevel
             np.putmask(vals, vals > clipvalue, np.nan)
+            clipvalue = valmedian / clipLevel
+            np.putmask(vals, vals < clipvalue, np.nan)
         
             # writing back the solutions
-            coord = removeKeys(coord, axesToSmooth)
+            coord = removeKeys(coord, axesToMed)
             sw.setSelection(**coord)
             sw.setValues(vals)
 
