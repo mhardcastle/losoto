@@ -8,7 +8,7 @@ from operations_lib import *
 import pyrap.measures
 import numpy
 import os
-from pylab import *
+#from pylab import *
 
 
 logging.debug('Loading TECSCREEN module.')
